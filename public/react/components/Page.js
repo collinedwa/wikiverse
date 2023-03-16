@@ -37,11 +37,13 @@ export const Page = (props) => {
   }
 
   function PageData({data}){
+    const authorName = (data.author) ? data.author.name : "[DELETED]";
+
     return <>
     <h2 className="page-title">{data.title}</h2>
     <div className="info-box">
     <p className="key">Author: </p>
-    <p className="value">{data.author.name}</p>
+    <p className="value">{authorName}</p>
     </div>
     <div className="info-box">
     <p className="key">Published:</p> 

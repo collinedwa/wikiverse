@@ -28,10 +28,10 @@ export function AddingPage(){
         const data = await response.json();
     }
 
-    const disabledState = (title.length < 3 || author.length < 3 || authorEmail.length < 3 || content.length < 3)
+    const addPageDisabledState = (title.length < 3 || author.length < 3 || authorEmail.length < 3 || content.length < 3)
 
     return <>
-    <h2>Add a Page</h2>
+    <h2>Add a page</h2>
     <form onSubmit={handleSubmit} id="add-page">
     <input type="text" placeholder="Title" aria-label="title" value={title} onChange={(e) => {setTitle(e.target.value)}}/>
     <input type="text" placeholder="Content" aria-label="content" value={content} onChange={(e) => {setContent(e.target.value)}}/>
@@ -40,7 +40,7 @@ export function AddingPage(){
     <input type="text" placeholder="Tags" aria-label="tags" value={tags} onChange={(e) => {setTags(e.target.value)}}/>
     <button type="submit" onClick={()=>{setArticleData({
         title:title, content:content, name:author, email:authorEmail, tags:tags
-        });}} className="button" disabled={disabledState}>Submit</button>
+        });}} className="button" disabled={addPageDisabledState}>Submit</button>
     </form>
     </>
 }

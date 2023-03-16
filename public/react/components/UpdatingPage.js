@@ -49,7 +49,7 @@ export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDispla
         setDisplay(true);
     }
 
-    const disabledState = (title.length < 3 && content.length < 3 && tags.length < 3)
+    const updatePageDisabledState = (title.length < 3 && content.length < 3 && tags.length < 3)
 
     return <>
     <form onSubmit={handleSubmit}>
@@ -69,7 +69,7 @@ export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDispla
     <input type="text" placeholder={tagString} aria-label="tags" value={tags} onChange={(e) => {setTags(e.target.value)}}/>
     <div className="button">
     <button onClick={()=>{backButton()}}>Back</button>
-    <button type="submit" onClick={()=>{handleData()}} disabled={disabledState}>Submit</button>
+    <button type="submit" onClick={()=>{handleData()}} disabled={updatePageDisabledState}>Submit</button>
     </div>
     </form>
     </>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { PagesList } from './PagesList';
-import { AddingPage } from "./AddingPage"
+import { AddingPage } from "./AddingPage";
 import { AuthorList } from "./AuthorList";
+import { AddingAuthor } from "./AddingAuthor";
 
 // import and prepend the api url to any fetch calls
 import apiURL from '../api';
@@ -11,6 +12,7 @@ export const App = () => {
 	const [pages, setPages] = useState([]);
 	const [authors, setAuthors] = useState([]);
 	const [addingPage, setAddingPage] = useState(false);
+	const [addingAuthor, setAddingAuthor] = useState(false);
 	const [searchingPage, setSearchingPage] = useState(false);
 
 	const searchResult = async () => {
@@ -43,7 +45,12 @@ export const App = () => {
 	const clickHandler = () => {
 		fetchPages();
 		setAddingPage(!addingPage);
-		setSearchingPage(!searchingPage)
+		setSearchingPage(!searchingPage);
+	}
+
+	const userClickHandler = () => {
+		fetchAuthors();
+		setAddingAuthor(!addingAuthor);
 	}
 
 	useEffect(() => {
@@ -63,7 +70,11 @@ export const App = () => {
 		<main>
 			<authors>
 			<h1 className="top-of-list">Authors</h1>
-			<AuthorList authors={authors}/>
+			{!addingAuthor ? <AuthorList authors={authors} setAuthors={setAuthors} fetchAuthors={fetchAuthors}/> : null}
+			{!addingAuthor ? <button onClick={userClickHandler} className="button">Add a user</button> : null}
+			{addingAuthor ? <><AddingAuthor/> 
+			<button className="button" onClick={userClickHandler}>Back</button>
+			</>: null}
 			</authors>
 			<pages>
 			<h1 className="top-of-list">Articles</h1>
