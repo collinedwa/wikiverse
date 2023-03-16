@@ -50,10 +50,12 @@ export const Author = (props) => {
   return <>
     <h3 hidden={authDisplay} className="page-link" onClick={()=>{getData()}}>{props.author.name}</h3>
     {authDisplay ? <> 
+    <div className="page-data">
     <AuthorData data={authData}/>
     <div className="buttons">
     <button className="button" onClick={()=>{backButton()}}>Back</button>
     <button className="button" onClick={()=>{deleteUser()}}>Delete</button>
+    </div>
     </div>
     </>: null}
   </>
