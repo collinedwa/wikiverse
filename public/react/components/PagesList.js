@@ -1,4 +1,4 @@
-import React, {use} from 'react';
+import React, {useState} from 'react';
 import { Page } from './Page';
 
 export const PagesList = ({pages, setPages, fetchPages, searchingPage, setSearchingPage}) => {

@@ -56,7 +56,7 @@ export const Page = (props) => {
   }
 
   return <>
-    <h3 hidden={display || updatingPage} onClick={()=>{getData()}}>{props.page.title}</h3>
+    <h3 className="page-link" hidden={display || updatingPage} onClick={()=>{getData()}}>{props.page.title}</h3>
     {(display && !props.searchingPage) ? <>
     <div className="page-data">
     <PageData data={pageData}/>

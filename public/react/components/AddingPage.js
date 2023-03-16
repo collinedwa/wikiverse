@@ -40,7 +40,7 @@ export function AddingPage(){
     <input type="text" placeholder="Tags" aria-label="tags" value={tags} onChange={(e) => {setTags(e.target.value)}}/>
     <button type="submit" onClick={()=>{setArticleData({
         title:title, content:content, name:author, email:authorEmail, tags:tags
-        });}} disabled={disabledState}>Submit</button>
+        });}} className="button" disabled={disabledState}>Submit</button>
     </form>
     </>
 }
