@@ -78,9 +78,14 @@ router.put("/:slug", async (req, res, next) => {
       return tag;
     }));
 
-    await updatedPages[0].setTags(tags);
+    const selectedPage = await Page.findOne({
+      where: {
+        slug: req.params.slug
+      }
+    })
 
-    res.send(updatedPages[0]);
+    await selectedPage.setTags(tags);
+    res.json({"updated pages": updatedPages[0]});
   } catch (error) {
     next(error);
   }
