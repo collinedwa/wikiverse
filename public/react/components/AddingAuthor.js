@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 import apiURL from '../api';
 
-export function AddingAuthor(){
+export function AddingAuthor({userClickHandler}){
     const [authName, setAuthName] = useState("")
     const [authEmail, setAuthEmail] = useState("")
     const [newAuthData, setNewAuthData] = useState({})
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setAuthName('');
-        setAuthEmail('');
         const response = await fetch(`${apiURL}/users/`, {
             method: "POST",
             headers: {
@@ -20,6 +18,9 @@ export function AddingAuthor(){
         });
 
         const data = await response.json();
+        userClickHandler();
+        setAuthName('');
+        setAuthEmail('');
     }
 
     const authDisabledState = (authName.length < 3 || authEmail.length < 3)

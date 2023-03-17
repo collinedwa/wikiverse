@@ -9,8 +9,10 @@ export const Page = (props) => {
   [updatingPage, setUpdatingPage] = useState(false);
 
   const getData = async () => {
+    //modifies state & display of app
     props.setSearchingPage(false);
     await props.setPages([props.page]);
+    //fetches specific page data
     const res = await fetch(`${apiURL}/wiki/${props.page.slug}`)
     const data = await res.json();
     setData(data);
@@ -23,6 +25,7 @@ export const Page = (props) => {
   })
     const data = await res.json();
     await props.fetchPages();
+    await props.fetchTags();
     setDisplay(false);
   }
 
@@ -37,7 +40,11 @@ export const Page = (props) => {
   }
 
   function PageData({data}){
+    //handles data for deleted authors
     const authorName = (data.author) ? data.author.name : "[DELETED]";
+
+    //formats date
+    const date = data.createdAt.substring(0,10)
 
     return <>
     <h2 className="page-title">{data.title}</h2>
@@ -47,7 +54,7 @@ export const Page = (props) => {
     </div>
     <div className="info-box">
     <p className="key">Published:</p> 
-    <p className="value">{data.createdAt}</p>
+    <p className="value">{date}</p>
     </div>
     <p className="content">{data.content}</p>
     <div className="info-box">
@@ -69,7 +76,9 @@ export const Page = (props) => {
     </div>
     </div>
     </> : null}
-    {updatingPage ? <UpdatingPage data={pageData} slug={props.page.slug} fetchPages={props.fetchPages} setUpdatingPage={setUpdatingPage} setDisplay={setDisplay}/> : null}
+    {updatingPage ? <UpdatingPage data={pageData} slug={props.page.slug} 
+    fetchPages={props.fetchPages} setUpdatingPage={setUpdatingPage} 
+    setDisplay={setDisplay} fetchTags={props.fetchTags}/> : null}
   </>
 } 
 	

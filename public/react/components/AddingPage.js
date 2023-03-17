@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import apiURL from '../api';
 
-export function AddingPage(){
+export function AddingPage({clickHandler}){
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
     const [author, setAuthor] = useState("")
@@ -12,11 +12,6 @@ export function AddingPage(){
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setTitle('');
-        setContent('');
-        setAuthor('');
-        setAuthorEmail('');
-        setTags('');
         const response = await fetch(`${apiURL}/wiki/`, {
             method: "POST",
             headers: {
@@ -26,6 +21,12 @@ export function AddingPage(){
         });
 
         const data = await response.json();
+        clickHandler();
+        setTitle('');
+        setContent('');
+        setAuthor('');
+        setAuthorEmail('');
+        setTags('');
     }
 
     const addPageDisabledState = (title.length < 3 || author.length < 3 || authorEmail.length < 3 || content.length < 3)

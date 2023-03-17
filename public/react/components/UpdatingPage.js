@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import apiURL from '../api';
 
-export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDisplay}){
+export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDisplay, fetchTags}){
     let tagString = "";
 
     data.tags.map((tag) => {tagString += (tag.name + " ")})
@@ -19,6 +19,7 @@ export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDispla
 
         if (title.length < 3 || title == "") pushedTitle = data.title;
         if (content.length < 3 || content == "") pushedContent = data.content;
+        if (tags == "") pushedTags = tagString;
 
         setArticleData({
             title: pushedTitle, content: pushedContent, tags: pushedTags
@@ -27,9 +28,6 @@ export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDispla
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setTitle('');
-        setContent('');
-        setTags('');
         const response = await fetch(`${apiURL}/wiki/${slug}`, {
             method: "PUT",
             headers: {
@@ -37,11 +35,18 @@ export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDispla
             },
             body: JSON.stringify(articleData)
         });
-
+        try{
         const data = await response.json();
-        await fetchPages();
+        }catch(err){
+            console.log(err);
+        }
+        fetchPages();
+        fetchTags();
         setUpdatingPage(false);
         setDisplay(false);
+        setTitle('');
+        setContent('');
+        setTags('');
     }
 
     const backButton = async () => {
