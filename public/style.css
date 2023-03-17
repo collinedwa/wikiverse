@@ -42,7 +42,7 @@ logo {
 }
 
 
-tags, authors {
+trending, authors {
   background-color: #fffdfb;
   text-align: center;
   display: flex;
@@ -51,13 +51,13 @@ tags, authors {
   border-width: 3px;
   border-style: solid;
   border-radius: 5px;
-  width: 15%;
+  width: 17.5vw;
   border-color: #FFF6EC;
   border-top: 0;
   border-bottom: 0;
 }
 
-tags{
+trending{
   border-right:0;
 }
 
@@ -84,7 +84,7 @@ pages {
   flex-direction: column;
   border-top: 0;
   border-bottom: 0;
-  width: 50%;
+  width: 50vw;
 }
 
 #root{
@@ -104,14 +104,14 @@ h3 {
 }
 
 .value{
-  padding-left: 1%
+  padding-left: 0.25vw
 }
 
 .info-box {
   display: flex;
   flex-direction: row;
-  margin-top: 1%;
-  margin-bottom: 1%;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
   border-color:#FFF6EC;
   border-width: 2px;
   border-style: solid;
@@ -133,7 +133,7 @@ h3 {
 
 .tag{
   text-align: left;
-  margin: 1%;
+  margin: 1vh;
 }
 
 #root{
@@ -142,6 +142,7 @@ h3 {
 
 .page-title{
   background-color: #FFF6EC;
+  border-radius: 5px;
   padding-top: 0.5vh;
   padding-bottom: 0.5vh;
 }
@@ -153,7 +154,7 @@ h3 {
 }
 
 .buttons{
-  margin-top: 1%;
+  margin-top: 1vh;
 }
 
 .button {
@@ -165,6 +166,12 @@ h3 {
 .top-of-list{
   margin-top:1vh;
   margin-bottom:1vh;
+  background-color: #FFFBF6;
+  border-style: solid;
+  border-color: #FFF6EC;
+  border-radius: 5px;
+  border-left:0;
+  border-right:0;
 }
 
 .page-link{
@@ -183,7 +190,7 @@ h3 {
 }
 
 form {
-  margin: 2%;
+  margin: 0.5vw;
   padding: 3%;
   display: flex;
   flex-direction: column;
@@ -195,7 +202,7 @@ form {
 
 .page-data {
   background-color: #fffefd;
-  margin: 2%;
+  margin: 0.5vw;
   padding: 3%;
   display: flex;
   flex-direction: column;
@@ -203,6 +210,15 @@ form {
   border-width: 3px;
   border-color: #FFF6EC;
   border-radius: 5px;
+}
+
+.tag-list{
+  border-color:#FFF6EC;
+  border-width: 2px;
+  border-style: solid;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
 }
 
 button {
