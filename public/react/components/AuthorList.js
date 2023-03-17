@@ -5,7 +5,7 @@ export const AuthorList = ({authors, fetchAuthors, setAuthors}) => {
 	
 	return <>
 		{
-			authors.map((author, idx) => <Author author={author} fetchAuthors={fetchAuthors} setAuthors={setAuthors}/>)
+			authors.map((author, idx) => <Author author={author} key={idx} fetchAuthors={fetchAuthors} setAuthors={setAuthors}/>)
 		}
 	</>
 } 
