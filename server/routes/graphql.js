@@ -17,7 +17,7 @@ type Page {
     createdAt: String!
     updatedAt: String!
     authorId: ID!
-    author: User!
+    author: User
 }
 
 type Query {
@@ -25,6 +25,10 @@ type Query {
     getSingleUser(id: ID!): User!
     getPages: [Page!]
     getSinglePage(id: ID!): Page!
+}
+
+type Mutation {
+    createUser(name: String!, email: String!): User
 }
 `);
 
@@ -44,11 +48,11 @@ const root = {
     return pages;
   },
 //single get
-  getSingleUser : async (params) => {
+  getUser : async (params) => {
     user = await User.findByPk(params.id);
     return user;
   },
-  getSinglePage : async (params) => {
+  getPage : async (params) => {
     page = await Page.findByPk(params.id, {
         include: {
             model: User,
@@ -56,6 +60,13 @@ const root = {
         }
     });
     return page;
+  },
+  //Mutation functions
+  createUser: async (params) => {
+    if (params.name.length < 2) throw new Error("invalid parameters")
+
+    newUser = await User.create(params);
+    return newUser;
   }
 };
 
