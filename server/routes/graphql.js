@@ -1,7 +1,10 @@
-const { buildSchema } = require("graphql")
-const { Page, User } = require("../models");
+const { buildSchema } = require("graphql");
+const { Page, User, Tag } = require("../models");
+const sequelize = require("../db");
 
 const schema = buildSchema(`
+scalar DateTime
+
 type User {
     id: ID!
     name: String!
@@ -15,17 +18,26 @@ type Page {
     slug: String!
     content: String!
     status: String!
-    createdAt: String!
-    updatedAt: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
     authorId: ID!
     author: User
+    tags: [Tag]
+}
+
+type Tag {
+  name: String!
+  createdAt: String!
+  pageCount: Int!
 }
 
 type Query {
     getUsers: [User!]
     getUser(id: ID!): User!
     getPages: [Page!]
-    getPage(id: ID!): Page!
+    getPage(slug: String!): Page!
+    getTags: [Tag!]
+    getSearchResults(query: String!): [Page!]
 }
 
 type Mutation {
@@ -34,11 +46,14 @@ type Mutation {
 
     createPage(title: String!, content: String!, name: String!, email: String!, tags: String!): Page
     deletePage(id: ID!): Page
+    updatePage(slug: String!, title: String, content: String, tags: String): Page
 }
 `);
 
 const root = {
+//Queries *******************************************************
 //bulk get
+
   getUsers : async () => {
     users = await User.findAll({
       include: {
@@ -48,6 +63,7 @@ const root = {
     });
     return users;
   },
+
   getPages : async () => {
     pages = await Page.findAll({
         include: {
@@ -57,7 +73,32 @@ const root = {
     });
     return pages;
   },
+
+  getSearchResults: async (params) => {
+    try {
+      const pages = await Page.findByTag(params.query);
+      return pages;
+    } catch (err) {
+      return err
+    }
+  },
+
+  getTags : async () => {
+    try {
+      const tags = await sequelize.sequelize.query(
+        'SELECT tags.name, tags.createdAt, COUNT(page_tags.pageId) AS "pageCount" FROM "page_tags" \
+        LEFT JOIN tags ON tags.id = page_tags.tagId \
+        GROUP BY name \
+        ORDER BY pageCount DESC, tags.createdAt DESC \
+        LIMIT 3'
+      );
+      return tags[0];
+    }catch (err) {
+      return err;
+    }
+  },
 //single get
+
   getUser : async (params) => {
     user = await User.findByPk(params.id, {
       include: {
@@ -67,17 +108,32 @@ const root = {
     });
     return user;
   },
+
   getPage : async (params) => {
-    page = await Page.findByPk(params.id, {
-        include: {
+    try {
+      const page = await Page.findOne({
+        where: {
+          slug: params.slug
+        },
+        include: [
+          {
+            model: Tag,
+            through: { attributes: [] } // exclude join table data
+          },
+          {
             model: User,
-            as: "author"
-        }
-    });
-    return page;
+            as: 'author'
+          }
+        ],
+      });
+      return page;
+    }catch (err) {
+      return err;
+    }
   },
-  //Mutation functions
+  //Mutation functions *****************************************
   //User
+
   createUser: async (params) => {
     if (params.name.length < 2) throw new Error("invalid parameters")
     try{
@@ -87,6 +143,7 @@ const root = {
       return err;
     }
   },
+
   deleteUser : async (params) => {
     try{
       user = await User.findByPk(params.id);
@@ -97,6 +154,7 @@ const root = {
     }
   },
   //Page
+  
   createPage: async (params) => {
     try {
       const [user, wasCreated] = await User.findOrCreate({
@@ -131,12 +189,48 @@ const root = {
       return error;
     }
   },
+
   deletePage: async (params) => {
     try{
       page = await Page.findByPk(params.id);
       await page.destroy();
       return page;
     }catch(err){
+      return err;
+    }
+  },
+
+  updatePage: async (params) => {
+    try {
+      const [updatedRowCount, updatedPages] = await Page.update({
+        title: params.title,
+        content: params.content
+      }, {
+        where: {
+          slug: params.slug
+        },
+        returning: true
+      });
+  
+      const tagArray = params.tags.split(' ');
+      const tags = await Promise.all(tagArray.map(async (tagName) => {
+        const [tag, wasCreated] = await Tag.findOrCreate({
+          where: {
+            name: tagName
+          }
+        });
+        return tag;
+      }));
+  
+      const selectedPage = await Page.findOne({
+        where: {
+          slug: params.slug
+        }
+      })
+  
+      await selectedPage.setTags(tags);
+      return updatedPages[0]
+    } catch (err) {
       return err;
     }
   }

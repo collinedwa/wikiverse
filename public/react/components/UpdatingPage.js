@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import apiURL from '../api';
+import gqlURL from "../gql";
 
 export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDisplay, fetchTags}){
     let tagString = "";
@@ -28,12 +28,26 @@ export function UpdatingPage({data, slug, fetchPages, setUpdatingPage, setDispla
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(`${apiURL}/wiki/${slug}`, {
-            method: "PUT",
+        const response = await fetch(`${gqlURL}`, {
+            method: "POST",
             headers: {
             'Content-Type': 'application/json'
             },
-            body: JSON.stringify(articleData)
+            body: JSON.stringify({
+                query:`
+                mutation{
+                    updatePage(
+                        slug: "${slug}",
+                        title: "${articleData.title}",
+                        content: "${articleData.content}",
+                        tags: "${articleData.tags}"
+                    ){
+                        title
+                    }
+                }
+                `,
+                variables: {articleData}
+            })
         });
         try{
         const data = await response.json();

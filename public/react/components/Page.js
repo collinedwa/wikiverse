@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {UpdatingPage} from "./UpdatingPage"
 
-import apiURL from '../api';
+import gqlURL from "../gql";
 
 export const Page = (props) => {
   [pageData, setData] = useState({});
@@ -13,16 +13,60 @@ export const Page = (props) => {
     props.setSearchingPage(false);
     await props.setPages([props.page]);
     //fetches specific page data
-    const res = await fetch(`${apiURL}/wiki/${props.page.slug}`)
+    const res = await fetch(`${gqlURL}`, {
+      method: "POST",
+      headers: {
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          query:`
+          query{
+              getPage(
+                  slug: "${props.page.slug}"
+              ){
+                  id
+                  slug
+                  title
+                  content
+                  author{
+                    name
+                    email
+                  }
+                  tags{
+                    name
+                  }
+                  createdAt
+                  updatedAt
+              }
+          }
+          `,
+          variables: {slug: props.page.slug}
+      })
+    });
     const data = await res.json();
-    setData(data);
+    setData(data.data.getPage);
     setDisplay(true);
   }
 
   const deletePage = async () => {
-    const res = await fetch(`${apiURL}/wiki/${props.page.slug}`, {
-      method: "DELETE"
-  })
+    const res = await fetch(`${gqlURL}`, {
+      method: "POST",
+      headers: {
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          query:`
+          mutation{
+              deletePage(
+                id: "${props.page.id}"
+              ){
+                title
+              }
+          }
+          `,
+          variables: {id: props.page.id}
+      })
+    });
     const data = await res.json();
     setDisplay(false);
     await props.fetchPages();

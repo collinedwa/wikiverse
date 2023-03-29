@@ -6,7 +6,7 @@ import { AddingAuthor } from "./AddingAuthor";
 import { TagsList } from "./TagsList";
 
 // import and prepend the api url to any fetch calls
-import apiURL from '../api';
+import gqlURL from "../gql";
 
 export const App = () => {
 	const [search, setSearch] = useState("");
@@ -20,16 +20,59 @@ export const App = () => {
 	const searchResult = async () => {
 		//refreshes Page List based on search
 		setSearchingPage(true);
-		const response = await fetch(`${apiURL}/wiki/search?search=${search}`);
+		const response = await fetch(`${gqlURL}`, {
+			method: "POST",
+			headers: {
+			'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				query:`
+				query{
+					getSearchResults(
+						query: "${search}"
+					){
+						id
+						title
+						slug
+						content
+						createdAt
+						updatedAt
+					}
+				}
+				`,
+				variables: {query: search}
+			})
+		  });
 		const pagesData = await response.json();
-		setPages(pagesData);
+		setPages(pagesData.data.getSearchResults);
 	}
 
 	async function fetchPages(){
 		try {
-			const response = await fetch(`${apiURL}/wiki`);
+			const response = await fetch(`${gqlURL}`, {
+				method: "POST",
+				headers: {
+				'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					query:`
+					query{
+						getPages{
+							id
+							title
+							slug
+							content
+							createdAt
+							updatedAt
+						}
+					}
+					`,
+					variables: {}
+				})
+			  });
 			const pagesData = await response.json();
-			setPages(pagesData);
+			console.log(pagesData)
+			setPages(pagesData.data.getPages);
 		} catch (err) {
 			console.log("Oh no an error! ", err)
 		}
@@ -37,9 +80,26 @@ export const App = () => {
 
 	async function fetchTags(){
 		try {
-			const response = await fetch(`${apiURL}/tags`);
+			const response = await fetch(`${gqlURL}`, {
+				method: "POST",
+				headers: {
+				'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					query:`
+					query{
+						getTags{
+							name
+							createdAt
+							pageCount
+						}
+					}
+					`,
+					variables: {}
+				})
+			});
 			const tagsData = await response.json();
-			setTags(tagsData);
+			setTags(tagsData.data.getTags);
 		} catch (err) {
 			console.log("Oh no an error! ", err)
 		}
@@ -48,9 +108,29 @@ export const App = () => {
 
 	async function fetchAuthors(){
 		try {
-			const response = await fetch(`${apiURL}/users`);
+			const response = await fetch(`${gqlURL}`, {
+				method: "POST",
+				headers: {
+				'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					query:`
+					query{
+						getUsers{
+							id
+							name
+							email
+							pages{
+							  title
+							}
+						}
+					}
+					`,
+					variables: {}
+				})
+			});
 			const authorsData = await response.json();
-			setAuthors(authorsData);
+			setAuthors(authorsData.data.getUsers);
 		} catch (err) {
 			console.log("Oh no an error! ", err)
 		}
@@ -74,7 +154,7 @@ export const App = () => {
 		fetchPages();
 		fetchAuthors();
 		fetchTags();
-	}, [searchingPage]);
+	}, []);
 
 	return (<>
 		<header>
@@ -105,7 +185,7 @@ export const App = () => {
 			</pages>
 			<trending>
 			<h1 className="top-of-list">Trending</h1>
-			<TagsList tags={tags[0]} searchResult={searchResult} setSearch={setSearch}/>
+			<TagsList tags={tags} searchResult={searchResult} setSearch={setSearch}/>
 			</trending>
 		</main>
 		</>
