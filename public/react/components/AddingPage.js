@@ -1,47 +1,67 @@
 import React, { useState, useEffect } from 'react';
 
-import apiURL from '../api';
+import gqlURL from "../gql";
 
 export function AddingPage({clickHandler}){
-    const [title, setTitle] = useState("")
-    const [content, setContent] = useState("")
-    const [author, setAuthor] = useState("")
-    const [authorEmail, setAuthorEmail] = useState("")
-    const [tags, setTags] = useState("")
-    const [articleData, setArticleData] = useState({})
+    const [articleData, setArticleData] = useState({
+        title: "",
+        content: "",
+        name: "",
+        email: "",
+        tags: ""
+    })
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(`${apiURL}/wiki/`, {
+        console.log(articleData);
+        const response = await fetch(`${gqlURL}`, {
             method: "POST",
             headers: {
             'Content-Type': 'application/json'
             },
-            body: JSON.stringify(articleData)
+            body: JSON.stringify({
+                query:`
+                mutation{
+                    createPage(
+                        title: "${articleData.title}",
+                        content: "${articleData.content}",
+                        name: "${articleData.name}",
+                        email: "${articleData.email}",
+                        tags: "${articleData.tags}"
+                    ){
+                        title
+                    }
+                }
+                `,
+                variables: {articleData}
+            })
         });
-
         const data = await response.json();
+        console.log(data)
         clickHandler();
-        setTitle('');
-        setContent('');
-        setAuthor('');
-        setAuthorEmail('');
-        setTags('');
+        setArticleData({
+            title: "",
+            content: "",
+            name: "",
+            email: "",
+            tags: ""
+        });
     }
 
-    const addPageDisabledState = (title.length < 3 || author.length < 3 || authorEmail.length < 3 || content.length < 3)
+    const addPageDisabledState = (articleData.title.length < 3 
+        || articleData.name.length < 3 
+        || articleData.email.length < 3 
+        || articleData.content.length < 3);
 
     return <>
     <h2>Add a page</h2>
     <form onSubmit={handleSubmit} id="add-page">
-    <input type="text" placeholder="Title" aria-label="title" value={title} onChange={(e) => {setTitle(e.target.value)}}/>
-    <input type="text" placeholder="Content" aria-label="content" value={content} onChange={(e) => {setContent(e.target.value)}}/>
-    <input type="text" placeholder="Author" aria-label="author" value={author} onChange={(e) => {setAuthor(e.target.value)}}/>
-    <input type="text" placeholder="E-mail" aria-label="authorEmail" value={authorEmail} onChange={(e) => {setAuthorEmail(e.target.value)}}/>
-    <input type="text" placeholder="Tags" aria-label="tags" value={tags} onChange={(e) => {setTags(e.target.value)}}/>
-    <button type="submit" onClick={()=>{setArticleData({
-        title:title, content:content, name:author, email:authorEmail, tags:tags
-        });}} className="button" disabled={addPageDisabledState}>Submit</button>
+    <input type="text" placeholder="Title" aria-label="title" value={articleData.title} onChange={(e) => {setArticleData({...articleData, title: e.target.value})}}/>
+    <input type="text" placeholder="Content" aria-label="content" value={articleData.content} onChange={(e) => {setArticleData({...articleData, content: e.target.value})}}/>
+    <input type="text" placeholder="Author" aria-label="name" value={articleData.name} onChange={(e) => {setArticleData({...articleData, name: e.target.value})}}/>
+    <input type="text" placeholder="E-mail" aria-label="email" value={articleData.email} onChange={(e) => {setArticleData({...articleData, email: e.target.value})}}/>
+    <input type="text" placeholder="Tags" aria-label="tags" value={articleData.tags} onChange={(e) => {setArticleData({...articleData, tags: e.target.value})}}/>
+    <button type="submit" className="button" disabled={addPageDisabledState}>Submit</button>
     </form>
     </>
 }

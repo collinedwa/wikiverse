@@ -29,6 +29,9 @@ type Query {
 
 type Mutation {
     createUser(name: String!, email: String!): User
+    deleteUser(id: ID!): User
+
+    createPage(title: String!, content: String!, name: String!, email: String!, tags: String!): Page
 }
 `);
 
@@ -62,11 +65,60 @@ const root = {
     return page;
   },
   //Mutation functions
+  //User
   createUser: async (params) => {
     if (params.name.length < 2) throw new Error("invalid parameters")
+    try{
+      newUser = await User.create(params);
+      return newUser;
+    }catch(err){
+      return err;
+    }
+  },
+  deleteUser : async (params) => {
+    try{
+      user = await User.findByPk(params.id);
+      await user.destroy();
+      return user;
+    }catch(err){
+      return err;
+    }
+  },
+  //Page
+  createPage: async (params) => {
+    try {
+      const [user, wasCreated] = await User.findOrCreate({
+        where: {
+          name: params.name,
+          email: params.email
+        }
+      });
+  
+      const page = await Page.create(params);
+  
+      await page.setAuthor(user);
+  
+      if(params.tags) {
+        const tagArray = params.tags.split(' ');
+        const tags = [];
+        for (let tagName of tagArray) {
+          const [tag, wasCreated] = await Tag.findOrCreate({
+            where: {
+              name: tagName
+            }
+          });
+          if (wasCreated) {
+            tags.push(tag);
+          }
+        }
+        await page.addTags(tags);
+      }
+  
+      return page;
+    } catch (error) {
+      return error;
+    }
 
-    newUser = await User.create(params);
-    return newUser;
   }
 };
 
