@@ -24,9 +24,9 @@ export const Page = (props) => {
       method: "DELETE"
   })
     const data = await res.json();
+    setDisplay(false);
     await props.fetchPages();
     await props.fetchTags();
-    setDisplay(false);
   }
 
   const pageUpdate = async() => {
