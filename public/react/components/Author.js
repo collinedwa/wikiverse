@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import apiURL from '../api';
+import gqlURL from '../gql';
 
 export const Author = (props) => {
   [authData, setAuthData] = useState({});
@@ -8,11 +8,33 @@ export const Author = (props) => {
 
   const getData = async () => {
     await props.setAuthors([props.author]);
-    const res = await fetch(`${apiURL}/users/${props.author.id}`)
+    const res = await fetch(`${gqlURL}`, {
+      method: "POST",
+      headers: {
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          query:`
+          query{
+              getUser(
+                  id: "${props.author.id}"
+              ){
+                  name
+                  email
+                  pages{
+                    title
+                  }
+              }
+          }
+          `,
+          variables: {id: props.author.id}
+      })
+    });
     const data = await res.json();
     setAuthDisplay(!authDisplay);
-    setAuthData(data);
-    console.log(data);
+    setAuthData(data.data.getUser);
+    console.log(data.data.getUser);
+    console.log(Object.keys(data))
   }
 
   const backButton = async () => {
@@ -21,9 +43,24 @@ export const Author = (props) => {
   }
 
   const deleteUser = async () => {
-    const res = await fetch(`${apiURL}/users/${props.author.id}`, {
-      method: "DELETE"
-  })
+    const res = await fetch(`${gqlURL}`, {
+      method: "POST",
+      headers: {
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          query:`
+          mutation{
+              deleteUser(
+                  id: "${props.author.id}"
+              ){
+                  name
+              }
+          }
+          `,
+          variables: {id: props.author.id}
+      })
+    })
     const data = await res.json();
     await props.fetchAuthors();
     setAuthDisplay(false);

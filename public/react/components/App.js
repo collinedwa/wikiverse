@@ -74,7 +74,7 @@ export const App = () => {
 		fetchPages();
 		fetchAuthors();
 		fetchTags();
-	}, []);
+	}, [searchingPage]);
 
 	return (<>
 		<header>

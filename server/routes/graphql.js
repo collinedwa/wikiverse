@@ -6,6 +6,7 @@ type User {
     id: ID!
     name: String!
     email: String!
+    pages: [Page!]
 }
 
 type Page {
@@ -22,9 +23,9 @@ type Page {
 
 type Query {
     getUsers: [User!]
-    getSingleUser(id: ID!): User!
+    getUser(id: ID!): User!
     getPages: [Page!]
-    getSinglePage(id: ID!): Page!
+    getPage(id: ID!): Page!
 }
 
 type Mutation {
@@ -32,13 +33,19 @@ type Mutation {
     deleteUser(id: ID!): User
 
     createPage(title: String!, content: String!, name: String!, email: String!, tags: String!): Page
+    deletePage(id: ID!): Page
 }
 `);
 
 const root = {
 //bulk get
   getUsers : async () => {
-    users = await User.findAll();
+    users = await User.findAll({
+      include: {
+        model: Page,
+        as: "pages"
+      }
+    });
     return users;
   },
   getPages : async () => {
@@ -52,7 +59,12 @@ const root = {
   },
 //single get
   getUser : async (params) => {
-    user = await User.findByPk(params.id);
+    user = await User.findByPk(params.id, {
+      include: {
+        model: Page,
+        as: "pages"
+      }
+    });
     return user;
   },
   getPage : async (params) => {
@@ -118,7 +130,15 @@ const root = {
     } catch (error) {
       return error;
     }
-
+  },
+  deletePage: async (params) => {
+    try{
+      page = await Page.findByPk(params.id);
+      await page.destroy();
+      return page;
+    }catch(err){
+      return err;
+    }
   }
 };
 
