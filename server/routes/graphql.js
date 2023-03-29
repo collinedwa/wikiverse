@@ -27,7 +27,7 @@ type Page {
 
 type Tag {
   name: String!
-  createdAt: String!
+  createdAt: DateTime!
   pageCount: Int!
 }
 
